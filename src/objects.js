@@ -1,6 +1,6 @@
 import './style.css';
 
-function todoObj(name, description, due, notes, done, priority,checklist)
+export function todoObj(name, description, due, notes, done, priority, checklist)
 {
     return {
         name: name,
@@ -14,12 +14,10 @@ function todoObj(name, description, due, notes, done, priority,checklist)
     };
 }
 
-function projectObj(name, todos)
+export function projectObj(name, todos)
 {
     return{
         name: name,
         todos: todos,        // array of todo objects
     };
 }
-
-export { todoObj, projectObj };

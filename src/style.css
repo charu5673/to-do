@@ -320,3 +320,10 @@ main
     color: #edfbff;
     font-weight: 600;
 }
+
+.create_todo_checklist
+{
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}

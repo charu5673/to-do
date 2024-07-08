@@ -5,6 +5,8 @@ import * as domUpdates from './domUpdates.js';
 import * as popUp from './popUp.js';
 
 var defaultTask;
+export let projects=[];
+export let currentProject=null;
 
 function initialize()
 {
@@ -13,13 +15,27 @@ function initialize()
     defaultTask=objects.todoObj(
         "Demo Task","This is a demo task",new Date(2024,7,10,5,30),"You can add notes here",true,"mid",[]
     );
-    var defaultProject=objects.projectObj("Project 1",[defaultTask]);
-    domUpdates.addProject(defaultProject);
-    domUpdates.displayProject(defaultProject);
+    createDefaultProject();
 }
 initialize();
 
+function createDefaultProject()
+{
+    var defaultProject=objects.projectObj("Project 1",[defaultTask]);
+    domUpdates.addProject(defaultProject);
+    domUpdates.displayProject(defaultProject);
+    projects.push(defaultProject);
+    currentProject=0;
+}
 
 
 
-console.log("hello");
+// event handlers
+
+document.querySelector(".create_new_todo").addEventListener("click",function(e){
+    if(currentProject==null)
+    createDefaultProject();
+    popUp.createTodoPopup();
+});
+
+
