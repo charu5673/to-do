@@ -1,6 +1,7 @@
 import './style.css';
 import * as objects from './objects.js';
 import * as index from './index.js';
+import * as domUpdates from './domUpdates.js';
 const fns=require("date-fns");
 
 export function createTodoPopup()
@@ -98,10 +99,28 @@ function addCreateHandler()
     document.querySelector(".create_todo").addEventListener("click",function(e){
         let flag=true;
         let name=document.querySelector("#create_todo_name");
-        let description=document.querySelector("#create_todo_description").textContent;
+        let description=document.querySelector("#create_todo_description").value;
         let date=document.querySelector("#create_todo_date");
         let time=document.querySelector("#create_todo_time").value;
-        let notes=document.querySelector("#create_todo_notes").textContent;
+        if(!(time==null||time==undefined||time==""))
+        {
+            if(parseInt(time.substring(0,2))>=12)
+            {
+                let a=parseInt(time.substring(0,2))-12;
+                if(a==0)
+                a=12;
+                if(a<10)
+                a=" "+a;
+                time=a+time.substring(2)+" PM";
+            }
+            else
+            {
+                if(parseInt(time.substring(0,2))==0)
+                time="12"+time.substring(2);
+                time+=" AM";
+            }
+        }
+        let notes=document.querySelector("#create_todo_notes").value;
         let p=document.querySelectorAll(".create_todo_priority"),priority=null;
         for(var i=0;i<p.length;i++)
         {
@@ -137,7 +156,7 @@ function addCreateHandler()
             let c=[];
             for(var i=0;i<checklist.length;i++)
             {
-                let s=checklist[i].firstChild.textContent;
+                let s=checklist[i].firstChild.value;
                 if(s==""||s==null||s==undefined)
                 continue;
                 c.push(s);
@@ -146,13 +165,14 @@ function addCreateHandler()
             name,
             description,
             date,
-            notes,
             time,
+            notes,
+            false,
             priority.value,
             c);
             index.projects[index.currentProject].todos.push(newTask);
+            domUpdates.displayTodo(newTask);
             document.querySelector("#todo_popup").remove();
-            let a=2;
         }
         else
         {

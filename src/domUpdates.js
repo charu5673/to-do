@@ -1,4 +1,6 @@
 import './style.css'
+import * as indexjs from './index.js';
+import * as sidebar from './sidebar.js';
 const fns = require('date-fns');
 
 export function displayProject(project)
@@ -56,6 +58,7 @@ export function createTodoDiv(todo)
     let checkInput=document.createElement("input");
     checkInput.type="checkbox";
     checkInput.className="todo_checkbox";
+    addCheckHandler(checkInput);
     row1Div.appendChild(nameDiv);
     row1Div.appendChild(checkInput);
     outerDiv.appendChild(row1Div);
@@ -66,10 +69,11 @@ export function createTodoDiv(todo)
     created.textContent="Created on: "+fns.format(todo.created,"P");
     let due=document.createElement("div");
     due.className="todo_due";
-    due.textContent="Due on: "+fns.format(todo.due,"P");
+    due.textContent="Due on: "+fns.format(todo.date,"P");
     row2Div.appendChild(created);
     row2Div.appendChild(due);
     outerDiv.appendChild(row2Div);
+    addSidebarHandler(outerDiv);
     return outerDiv;
 }
 
@@ -80,4 +84,38 @@ export function addProject(project)
     option.value=project.name;
     option.textContent=project.name;
     projectsList.appendChild(option);
+}
+
+export function displayTodo(todo)
+{
+    let todosDisplay=document.querySelector("#todos_display");
+    todosDisplay.appendChild(createTodoDiv(todo));
+}
+
+function addCheckHandler(check)
+{
+    check.addEventListener("click",function(e){
+        let parent=e.target.parentNode.parentNode;
+        var index = Array.prototype.indexOf.call(parent.parentNode.children, parent);
+        if(parent.classList.contains("done"))
+        {
+            parent.classList.remove("done");
+            indexjs.projects[indexjs.currentProject].todos[index].done=false;
+        }
+        else
+        {
+            parent.classList.add("done");
+            indexjs.projects[indexjs.currentProject].todos[index].done=true;
+        }
+        e.stopPropagation();
+    });
+}
+
+function addSidebarHandler(div)
+{
+    div.addEventListener("click",function(e){
+        e.target.classList.add("selected");
+        sidebar.bringSidebar(e);
+        e.stopPropagation();
+    });
 }
