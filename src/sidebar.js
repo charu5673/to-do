@@ -1,10 +1,15 @@
 import './style.css';
 import * as indexjs from './index.js'
+import * as popup from './popUp.js'
 const fns=require("date-fns");
 
 export function bringSidebar(e)
 {
     let sidebar=document.querySelector("#side");
+    if(sidebar.classList.contains("extended"))
+    removeSidebar();
+    if(!e.currentTarget.classList.contains("selected"))
+    e.target.classList.add("selected");
     sidebar.classList.add("extended");
     let display=document.querySelector("#todos_display");
     display.classList.add("reduced");
@@ -21,7 +26,18 @@ export function bringSidebar(e)
     todoDescription.textContent=todo.description;
     let todoNotes=document.querySelector("#sideTodoNotes");
     todoNotes.innerHTML="Notes<br>"+todo.notes;
+    let todoPriority=document.querySelector(".sidePriorityBox");
+    if(todo.priority=="high")
+    todoPriority.style.backgroundColor="#D56161";
+    else if(todo.priority=="mid")
+    todoPriority.style.backgroundColor="#D5D061";
+    else
+    todoPriority.style.backgroundColor="#63D561";
     let todoChecklist=document.querySelector("#sideTodoChecklist");
+    let edit=document.querySelector(".editTodo");
+    let delet=document.querySelector(".deleteTodo");
+    addEditHandler(edit);
+    addDeletHandler(delet);
     if(todo.checklist.length==0)
     todoChecklist.remove();
     else
@@ -77,17 +93,38 @@ function addChecklistHandler(input)
             }
         }
         let todo=indexjs.projects[indexjs.currentProject].todos[index];
-        if(todo.checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)])
+        if(todo.checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)-1])
         {
             e.target.checked=false;
             e.target.parentNode.lastChild.classList.remove("done");
-            indexjs.projects[indexjs.currentProject].todos[index].checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)]=false;
+            indexjs.projects[indexjs.currentProject].todos[index].checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)-1]=false;
         }
         else
         {
             e.target.checked=true;
             e.target.parentNode.lastChild.classList.add("done");
-            indexjs.projects[indexjs.currentProject].todos[index].checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)]=true;
+            indexjs.projects[indexjs.currentProject].todos[index].checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)-1]=true;
         }
+    });
+}
+
+function addEditHandler(edit)
+{
+    edit.addEventListener("click",function()
+    {
+        let d=document.querySelector("#todos_display");
+        for(var i=0;i<d.children.length;i++)
+        {
+            if(d.children[i].classList.contains("selected"))
+            break;
+        }
+        popup.editTodoPopup(indexjs.projects[indexjs.currentProject].todos[i]);
+    });
+}
+
+function addDeletHandler(delet)
+{
+    delet.addEventListener("click",function(){
+
     });
 }

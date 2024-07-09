@@ -2,6 +2,7 @@ import './style.css';
 import * as objects from './objects.js';
 import * as index from './index.js';
 import * as domUpdates from './domUpdates.js';
+import * as sidebar from './sidebar.js';
 const fns=require("date-fns");
 
 export function createTodoPopup()
@@ -42,9 +43,9 @@ export function editTodoPopup(todo)
     input=document.querySelector("#create_todo_description");
     input.textContent=todo.description;
     input=document.querySelector("#create_todo_date");
-    input.value=fns.format(todo.due,"yyyy-MM-dd");
+    input.value=fns.format(todo.date,"yyyy-MM-dd");
     input=document.querySelector("#create_todo_time");
-    input.value=fns.format(todo.due,"HH:mm:ss.SSS");
+    input.value=giveTime(todo.time);
     input=document.querySelectorAll(".create_todo_priority");
     if(todo.priority=="high")
     input[0].checked=true;
@@ -54,6 +55,107 @@ export function editTodoPopup(todo)
     input[2].checked=true;
     input=document.querySelector("#create_todo_notes");
     input.textContent=todo.notes;
+    addEditHandler();
+}
+
+function addEditHandler()
+{
+    document.querySelector(".create_todo").addEventListener("click",function(e){
+        let flag=true;
+        let name=document.querySelector("#create_todo_name");
+        let description=document.querySelector("#create_todo_description").value;
+        let date=document.querySelector("#create_todo_date");
+        let time=document.querySelector("#create_todo_time").value;
+        if(!(time==null||time==undefined||time==""))
+        {
+            if(parseInt(time.substring(0,2))>=12)
+            {
+                let a=parseInt(time.substring(0,2))-12;
+                if(a==0)
+                a=12;
+                if(a<10)
+                a="0"+a;
+                time=a+time.substring(2)+" PM";
+            }
+            else
+            {
+                if(parseInt(time.substring(0,2))==0)
+                time="12"+time.substring(2);
+                if(time.substring(1,2)==":")
+                time="0"+time;
+                time+=" AM";
+            }
+        }
+        let notes=document.querySelector("#create_todo_notes").value;
+        let p=document.querySelectorAll(".create_todo_priority"),priority=null;
+        for(var i=0;i<p.length;i++)
+        {
+            if(p[i].checked)
+            {
+                priority=p[i];
+                break;
+            }
+        }
+        let checklist=document.querySelectorAll(".create_todo_checklist");
+        if(priority==null||priority==undefined)
+        {
+            flag=false;
+            p.forEach((i)=>{i.style.borderBottom="3px solid #FF0000"});
+        }
+        if(name.value==undefined||name.value==null||name.value=="")
+        {
+            flag=false;
+            name.style.border="3px solid #FF0000";
+        }
+        else
+        name=name.value;
+        if(date.value==undefined||date.value==null||date.value=="")
+        {
+            flag=false;
+            date.style.border="3px solid #FF0000";
+        }
+        else
+        date=date.value;
+
+        if(flag)
+        {
+            let c=[];
+            for(var i=0;i<checklist.length;i++)
+            {
+                let s=checklist[i].firstChild.value;
+                if(s==""||s==null||s==undefined)
+                continue;
+                c.push(s);
+            }
+            let newTask=objects.todoObj(
+            name,
+            description,
+            date,
+            time,
+            notes,
+            false,
+            priority.value,
+            c);
+            let d=document.querySelector("#todos_display");
+            for(var i=0;i<d.children.length;i++)
+            {
+                if(d.children[i].classList.contains("selected"))
+                break;
+            }
+            index.projects[index.currentProject].todos[i]=newTask;
+            domUpdates.reDisplayTodo(newTask,i);
+            document.querySelector("#todo_popup").remove();
+            sidebar.bringSidebar();
+        }
+        else
+        {
+            e.target.style.backgroundColor="#FF0000";
+            p=document.createElement("p");
+            p.textContent="Please fill the required values.";
+            p.style.color="#FF0000";
+            document.querySelector("#create_todo_popup_box").insertBefore(p,document.querySelector("#create_todo_popup_box").firstChild);
+        }
+    });
 }
 
 export function addCheckList(i)
@@ -110,13 +212,15 @@ function addCreateHandler()
                 if(a==0)
                 a=12;
                 if(a<10)
-                a=" "+a;
+                a="0"+a;
                 time=a+time.substring(2)+" PM";
             }
             else
             {
                 if(parseInt(time.substring(0,2))==0)
                 time="12"+time.substring(2);
+                if(time.substring(1,2)==":")
+                time="0"+time;
                 time+=" AM";
             }
         }
@@ -183,4 +287,38 @@ function addCreateHandler()
             document.querySelector("#create_todo_popup_box").insertBefore(p,document.querySelector("#create_todo_popup_box").firstChild);
         }
     });
+}
+
+function giveTime(time)
+{
+    let p1="",p2="",p3="",i;
+    for(i=0;i<time.length;i++)
+    {
+        if(time.charAt(i)==":")
+        break;
+        p1+=time.charAt(i);
+    }
+    for(i=i+1;i<time.length;i++)
+    {
+        if(time.charAt(i)==" ")
+        break;
+        p2+=time.charAt(i);
+    }
+    p3=time.substring(i+1);
+    if(p3=="AM")
+    {
+        if(parseInt(p1)==12)
+        return "00:"+p2;
+        else if(parseInt(p1)>=10)
+        return p1+":"+p2;
+        else
+        return "0"+p1+":"+p2;
+    }
+    else
+    {
+        if(parseInt(p1)==12)
+        return "12:"+p2;
+        else
+        return (parseInt(p1)+12)+":"+p2;
+    }
 }

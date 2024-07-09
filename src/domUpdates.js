@@ -92,6 +92,14 @@ export function displayTodo(todo)
     todosDisplay.appendChild(createTodoDiv(todo));
 }
 
+export function reDisplayTodo(todo,i)
+{
+    let todosDisplay=document.querySelector("#todos_display");
+    let reqDiv=todosDisplay.children[i];
+    todosDisplay.insertBefore(createTodoDiv(todo),reqDiv);
+    reqDiv.remove();
+}
+
 function addCheckHandler(check)
 {
     check.addEventListener("click",function(e){
