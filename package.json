@@ -21,7 +21,10 @@
   },
   "homepage": "https://github.com/charu5673/to-do#readme",
   "devDependencies": {
+    "@eslint/js": "^9.6.0",
     "css-loader": "^7.1.2",
+    "eslint": "^9.6.0",
+    "globals": "^15.8.0",
     "style-loader": "^4.0.0",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"

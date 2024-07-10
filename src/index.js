@@ -94,6 +94,7 @@ document.querySelector("#create_project").addEventListener("click",function(){
 });
 
 document.querySelector("#projects_list").addEventListener("input",function(e){
+    sidebar.removeSidebar({target:document.querySelector(".todo.selected")});
     for(var i=0;i<projects.length;i++)
     {
         if(projects[i].name==e.target.value)
