@@ -8,14 +8,17 @@
 </head>
 <body>
     <header>
-        <select name="projects_list" id="projects_list" class="empty">
-            <option value="create_project">Create +</option>
-        </select>
+        <div class="project_area">
+            <select name="projects_list" id="projects_list">
+            </select>
+            <button id="create_project">+</button>
+        </div>
         <img id="logo">
     </header>
     <main>
         <div id="side">
             <button class="create_new_todo">Create new task +</button>
+            <button class="delet_project">Delete Project</button>
         </div>
         <div id="todos_display">
         </div>

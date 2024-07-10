@@ -1,6 +1,7 @@
 import './style.css';
-import * as indexjs from './index.js'
-import * as popup from './popUp.js'
+import * as indexjs from './index.js';
+import * as popup from './popUp.js';
+import * as storage from './storage.js';
 const fns=require("date-fns");
 
 export function bringSidebar(e)
@@ -8,8 +9,21 @@ export function bringSidebar(e)
     let sidebar=document.querySelector("#side");
     if(sidebar.classList.contains("extended"))
     removeSidebar();
-    if(!e.currentTarget.classList.contains("selected"))
-    e.target.classList.add("selected");
+    if((!e.currentTarget.classList.contains("selected"))&&e.currentTarget.classList.contains("todo"))
+    e.currentTarget.classList.add("selected");
+    else if((!e.currentTarget.classList.contains("selected"))||(!e.target.classList.contains("todo")))
+    {
+        let a=e.target;
+        while(true)
+        {
+            if(a.classList.contains("todo"))
+            {
+                a.classList.add("selected");
+                break;
+            }
+            a=a.parentElement;
+        }
+    }
     sidebar.classList.add("extended");
     let display=document.querySelector("#todos_display");
     display.classList.add("reduced");
@@ -67,11 +81,12 @@ export function bringSidebar(e)
 export function removeSidebar()
 {
     let sidebar=document.querySelector("#side");
-    sidebar.innerHTML='<button class="create_new_todo">Create new task +</button>';
+    sidebar.innerHTML='<button class="create_new_todo">Create new task +</button><button class="delet_project">Delete Project</button>';
     sidebar.classList.remove("extended");
     let d=document.querySelector("#todos_display");
     d.classList.remove("reduced");
     indexjs.createTodoHandler();
+    indexjs.deletProjectHandler();
     for(var i=0;i<d.children.length;i++)
     {
         if(d.children[i].classList.contains("selected"))
@@ -98,12 +113,14 @@ function addChecklistHandler(input)
             e.target.checked=false;
             e.target.parentNode.lastChild.classList.remove("done");
             indexjs.projects[indexjs.currentProject].todos[index].checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)-1]=false;
+            storage.setLocalStorage();
         }
         else
         {
             e.target.checked=true;
             e.target.parentNode.lastChild.classList.add("done");
             indexjs.projects[indexjs.currentProject].todos[index].checklistStatus[Array.prototype.indexOf.call(e.target.parentNode.parentNode.children,e.target.parentNode)-1]=true;
+            storage.setLocalStorage();
         }
     });
 }
@@ -125,6 +142,6 @@ function addEditHandler(edit)
 function addDeletHandler(delet)
 {
     delet.addEventListener("click",function(){
-
+        popup.deletPopup();
     });
 }

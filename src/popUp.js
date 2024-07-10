@@ -3,6 +3,7 @@ import * as objects from './objects.js';
 import * as index from './index.js';
 import * as domUpdates from './domUpdates.js';
 import * as sidebar from './sidebar.js';
+import * as storage from './storage.js';
 const fns=require("date-fns");
 
 export function createTodoPopup()
@@ -30,14 +31,13 @@ export function editTodoPopup(todo)
     div.addEventListener("click",function(e){
         div.remove();
     });
-    div.innerHTML='<div id="create_todo_popup_box"><label for="create_todo_name">Name</label><input type="text" id="create_todo_name"><label for="create_todo_description">Description</label><textarea id="create_todo_description"></textarea><label for="create_todo_date">Due date</label><input id="create_todo_date" type="date"><label for="create_todo_time">Due time</label><input type="time" id="create_todo_time"><label>Priority</label><input type="radio" class="create_todo_priority" name="create_todo_priority" value="high" style="background-color: #D56161;"><input type="radio" class="create_todo_priority" name="create_todo_priority" value="mid" style="background-color: #D5D061;"><input type="radio" class="create_todo_priority" name="create_todo_priority" value="low" style="background-color: #63D561;"><label for="create_todo_notes">Notes</label><textarea id="create_todo_notes"></textarea><div id="create_todo_checklist"><label>Checklist</label><button class="addCheck">+</button></div><div class="create_todo_checklist 1"><input type="text"><button class="removeCheck">-</button></div><button class="create_todo edit_todo">Edit</button></div>';
+    div.innerHTML='<div id="create_todo_popup_box"><label for="create_todo_name">Name</label><input type="text" id="create_todo_name"><label for="create_todo_description">Description</label><textarea id="create_todo_description"></textarea><label for="create_todo_date">Due date</label><input id="create_todo_date" type="date"><label for="create_todo_time">Due time</label><input type="time" id="create_todo_time"><label>Priority</label><input type="radio" class="create_todo_priority" name="create_todo_priority" value="high" style="background-color: #D56161;"><input type="radio" class="create_todo_priority" name="create_todo_priority" value="mid" style="background-color: #D5D061;"><input type="radio" class="create_todo_priority" name="create_todo_priority" value="low" style="background-color: #63D561;"><label for="create_todo_notes">Notes</label><textarea id="create_todo_notes"></textarea><div id="create_todo_checklist"><label>Checklist</label><button class="addCheck">+</button></div><button class="create_todo edit_todo">Edit</button></div>';
     var body=document.querySelector("body");
     body.insertBefore(div,body.firstChild);
     document.querySelector("#create_todo_popup_box").addEventListener("click",function(e){
         e.stopPropagation();
     });
     addAddHandler();
-    addRemoveHandler(document.querySelector(".removeCheck"));
     var input=document.querySelector("#create_todo_name");
     input.value=todo.name;
     input=document.querySelector("#create_todo_description");
@@ -55,6 +55,27 @@ export function editTodoPopup(todo)
     input[2].checked=true;
     input=document.querySelector("#create_todo_notes");
     input.textContent=todo.notes;
+    input=document.querySelector(".create_todo");
+    let d=document.querySelector("#create_todo_popup_box");
+    if(todo.checklist.length==0)
+    {
+        let check=document.createElement("div");
+        check.classList.add("create_todo_checklist","1");
+        check.innerHTML='<input type="text"><button class="removeCheck">-</button>';
+        d.insertBefore(check,input);
+        addRemoveHandler(check.lastChild);
+    }
+    else
+    {
+        for(var i=0;i<todo.checklist.length;i++)
+        {
+            let check=document.createElement("div");
+            check.classList.add("create_todo_checklist",""+(i+1));
+            check.innerHTML=`<input type="text" value="${todo.checklist[i]}"><button class="removeCheck">-</button>`;
+            d.insertBefore(check,input);
+            addRemoveHandler(check.lastChild);
+        }
+    }
     addEditHandler();
 }
 
@@ -143,9 +164,10 @@ function addEditHandler()
                 break;
             }
             index.projects[index.currentProject].todos[i]=newTask;
+            storage.setLocalStorage();
             domUpdates.reDisplayTodo(newTask,i);
             document.querySelector("#todo_popup").remove();
-            sidebar.bringSidebar();
+            sidebar.removeSidebar();
         }
         else
         {
@@ -275,6 +297,7 @@ function addCreateHandler()
             priority.value,
             c);
             index.projects[index.currentProject].todos.push(newTask);
+            storage.setLocalStorage();
             domUpdates.displayTodo(newTask);
             document.querySelector("#todo_popup").remove();
         }
@@ -321,4 +344,123 @@ function giveTime(time)
         else
         return (parseInt(p1)+12)+":"+p2;
     }
+}
+
+export function deletPopup()
+{
+    let div=document.createElement("div");
+    div.innerHTML='<div id="delet_todo_popup_box"><p>Delete this todo?</p><div class="delet_buttons"><button>Yes</button><button>No</button></div></div>';
+    div.id="delet_todo_popup";
+    div.addEventListener("click",function(e){
+        div.remove();
+    });
+    var body=document.querySelector("body");
+    body.insertBefore(div,body.firstChild);
+    document.querySelector("#delet_todo_popup_box").addEventListener("click",function(e){
+        e.stopPropagation();
+    });
+    div.firstChild.lastChild.firstChild.addEventListener("click",function(){
+        let d=document.querySelector("#todos_display");
+        for(var i=0;i<d.children.length;i++)
+        {
+            if(d.children[i].classList.contains("selected"))
+            {
+                d.children[i].remove();
+                break; 
+            }
+        }
+        index.projects[index.currentProject].todos.splice(i,1);
+        storage.setLocalStorage();
+        document.querySelector("#delet_todo_popup").remove();
+        sidebar.removeSidebar();
+    });
+    div.firstChild.lastChild.lastChild.addEventListener("click",function(){
+        document.querySelector("#delet_todo_popup").remove();
+    });
+}
+
+export function createProjectPopup()
+{
+    var div=document.createElement("div");
+    div.id="project_popup";
+    div.addEventListener("click",function(e){
+        div.remove();
+    });
+    div.innerHTML='<div id="create_project_popup_box"><label for="create_project_name">Name</label><input type="text" id="create_project_name"><button class="create_project">Create</button></div>';
+    var body=document.querySelector("body");
+    body.insertBefore(div,body.firstChild);
+    document.querySelector("#create_project_popup_box").addEventListener("click",function(e){
+        e.stopPropagation();
+    });
+    addCreateProjectHandler();
+}
+
+function addCreateProjectHandler()
+{
+    document.querySelector(".create_project").addEventListener("click",function(e){
+        let project=objects.projectObj(
+            document.querySelector("#create_project_name").value,
+            []
+        );
+        for(var i=0;i<index.projects.length;i++)
+        {
+            if(index.projects[i].name==project.name)
+            break;
+        }
+        if(i!=index.projects.length)
+        {
+            document.querySelector("#create_project_name").style.border="3px solid red";
+            let p=document.createElement("p");
+            p.textContent="Project by this name already exists!";
+            p.style.color="red";
+            if(document.querySelector("#create_project_popup_box").children.length==3)
+            document.querySelector("#create_project_popup_box").insertBefore(p,e.target);
+        }
+        else
+        {
+            index.projects.push(project);
+            storage.setLocalStorage();
+            document.querySelector("#project_popup").remove();
+            domUpdates.addProject(project);
+        }
+    });
+}
+
+export function addDeletProjectHandler()
+{
+    let div=document.createElement("div");
+    div.innerHTML='<div id="delet_project_popup_box"><p>Delete this project?</p><div class="delet_buttons"><button>Yes</button><button>No</button></div></div>';
+    div.id="delet_project_popup";
+    div.addEventListener("click",function(e){
+        div.remove();
+    });
+    var body=document.querySelector("body");
+    body.insertBefore(div,body.firstChild);
+    document.querySelector("#delet_project_popup_box").addEventListener("click",function(e){
+        e.stopPropagation();
+    });
+    div.firstChild.lastChild.firstChild.addEventListener("click",function(){
+        let d=document.querySelector("#projects_list");
+        for(var i=0;i<d.children.length;i++)
+        {
+            if(d.children[i].value==d.value)
+            {
+                d.children[i].remove();
+                break; 
+            }
+        }
+        index.projects.splice(i,1);
+        storage.setLocalStorage();
+        document.querySelector("#delet_project_popup").remove();
+        if(index.projects.length==0)
+        {
+            index.projects.push(index.createDefaultProject());
+            storage.setLocalStorage();
+            domUpdates.addProject(index.projects[0]);
+        }
+        domUpdates.displayProject(index.projects[0]);
+    });
+    div.firstChild.lastChild.lastChild.addEventListener("click",function(){
+        document.querySelector("#delet_project_popup").remove();
+    });
 }

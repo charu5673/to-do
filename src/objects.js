@@ -1,4 +1,5 @@
 import './style.css';
+import * as storage from './storage.js';
 
 export function todoObj(name, description, date, time, notes, done, priority, checklist)
 {

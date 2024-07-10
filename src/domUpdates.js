@@ -1,6 +1,7 @@
 import './style.css'
 import * as indexjs from './index.js';
 import * as sidebar from './sidebar.js';
+import * as storage from './storage.js';
 const fns = require('date-fns');
 
 export function displayProject(project)
@@ -23,6 +24,7 @@ export function displayProject(project)
         projectsList.classList.remove("empty");
         projectsList.selectedIndex=selectedProject;
         let todosDisplay=document.querySelector("#todos_display");
+        todosDisplay.innerHTML="";
         displayTodos(todosDisplay,project.todos);
         for(var i=0;i<projectsList.options.length;i++)
         {
@@ -109,11 +111,13 @@ function addCheckHandler(check)
         {
             parent.classList.remove("done");
             indexjs.projects[indexjs.currentProject].todos[index].done=false;
+            storage.setLocalStorage();
         }
         else
         {
             parent.classList.add("done");
             indexjs.projects[indexjs.currentProject].todos[index].done=true;
+            storage.setLocalStorage();
         }
         e.stopPropagation();
     });
@@ -122,7 +126,16 @@ function addCheckHandler(check)
 function addSidebarHandler(div)
 {
     div.addEventListener("click",function(e){
-        e.target.classList.add("selected");
+        let a=e.target;
+        while(true)
+        {
+            if(a.classList.contains("todo"))
+            {
+                a.classList.add("selected");
+                break;
+            }
+            a=a.parentElement;
+        }
         sidebar.bringSidebar(e);
         e.stopPropagation();
     });

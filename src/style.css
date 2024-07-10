@@ -23,9 +23,10 @@ header
     height: 15vh;
     display: flex;
     justify-content: space-between;
+    align-items: flex-end;
 }
 
-.create_new_todo
+.create_new_todo , .delet_project
 {
     padding: 20px;
     font-size: 1em;
@@ -46,7 +47,6 @@ header
     height: 6vh;
     width: 16.5vh;
     align-self: flex-end;
-    margin: 20px;
     font-weight: 600;
     font-size: 1.2em;
     color: #224B58;
@@ -84,6 +84,29 @@ header
     width: 16.5vh !important;
 }
 
+.project_area
+{
+    margin: 20px;
+    display: flex;
+    align-items: flex-end;
+}
+
+#create_project
+{
+    margin-left: 20px;
+    background-color: #F1EEDC;
+    border: none;
+    border-radius: 15px;
+    height: 6vh;
+    width: 6vh;
+    align-self: flex-end;
+    font-weight: 800;
+    font-size: 1.5em;
+    color: #224B58;
+    padding: 10px;
+    appearance: none;
+}
+
 #logo
 {
     height: 15vh;
@@ -108,6 +131,7 @@ main
     padding: 30px;
     display: grid;
     justify-content: center;
+    grid-template-rows: repeat(2,6em);
 }
 
 #todos_display
@@ -209,6 +233,30 @@ main
     align-items: center;
 }
 
+#project_popup
+{
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    z-index: 20;
+    background-color: #0000004f;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+#delet_todo_popup , #delet_project_popup
+{
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    z-index: 20;
+    background-color: #0000004f;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
 #create_todo_popup_box
 {
     height: 55vh;
@@ -223,7 +271,68 @@ main
     scrollbar-width: none;
 }
 
-#create_todo_popup_box label
+#create_project_popup_box
+{
+    height: 25vh;
+    width: 20vw;
+    background-color: #F1EEDC;
+    border: 5px solid #224B58;
+    border-radius: 50px;
+    padding: 30px;
+}
+
+#delet_todo_popup_box, #delet_project_popup_box
+{
+    height: 20vh;
+    width: 20vw;
+    background-color: #F1EEDC;
+    border: 5px solid #224B58;
+    border-radius: 50px;
+    padding: 30px;
+}
+
+#delet_todo_popup_box p, #delet_project_popup_box p
+{
+    text-align: center;
+    font-size: 1.6em;
+    color: #224B58;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.delet_buttons
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.delet_buttons button:first-child
+{
+    appearance: none;
+    border: none;
+    border-radius: 10px;
+    height: 40px;
+    width: 60px;
+    font-size: 1em;
+    background-color: #63D561;
+    color: #D3E2E5;
+}
+
+.delet_buttons button:last-child
+{
+    appearance: none;
+    border: none;
+    border-radius: 10px;
+    height: 40px;
+    width: 60px;
+    font-size: 1em;
+    background-color: #D56161;
+    color: #D3E2E5;
+}
+
+#create_todo_popup_box label , #create_project_popup_box label
 {
     display: block;
     margin-top: 30px;
@@ -233,12 +342,23 @@ main
     font-weight: 600;
 }
 
-#create_todo_popup_box input, #create_todo_notes,#create_todo_description
+#create_project_popup_box label
+{
+    margin-top: 0;
+}
+
+#create_todo_popup_box input, #create_todo_notes, #create_todo_description, #create_project_popup_box input
 {
     appearance: none;
     border: none;
     border-radius: 0;
     box-shadow: 1px 1px 1px 1px #0000003c;
+}
+
+#create_project_popup_box input
+{
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 #create_todo_popup_box label:first-child
@@ -307,7 +427,7 @@ main
     text-overflow: ellipsis;
 }
 
-#create_todo_popup_box > button
+#create_todo_popup_box > button , #create_project_popup_box button
 {
     appearance: none;
     font-size: 1em;
@@ -319,6 +439,11 @@ main
     border: none;
     color: #edfbff;
     font-weight: 600;
+}
+
+#create_project_popup_box button
+{
+    display: block;
 }
 
 .create_todo_checklist
